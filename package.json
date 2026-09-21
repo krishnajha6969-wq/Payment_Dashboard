@@ -1,0 +1,13 @@
+{
+  "name": "vikas-2026-payment-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Production frontend for the VIKAS 2026 payment verification dashboard",
+  "scripts": {
+    "test": "node scripts/validate.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
+
