@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#eaf7ff" />
+<title>VIKAS 2026 • Payment Verification Dashboard</title>
+<style>
+  :root{
+    --blue:#1a86e8;
+    --blue-2:#4db7ff;
+    --blue-3:#dff3ff;
+    --navy:#123a63;
+    --ink:#17324d;
+    --muted:#6d8194;
+    --line:#d9eaf5;
+    --soft:#f6fbff;
+    --white:#ffffff;
+    --green:#17a673;
+    --green-soft:#e9f9f2;
+    --amber:#e49a17;
+    --amber-soft:#fff6df;
+    --red:#d95562;
+    --red-soft:#fff0f2;
+    --shadow:0 18px 50px rgba(25,105,166,.12);
+    --shadow-sm:0 8px 26px rgba(25,105,166,.10);
+    --radius:18px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:linear-gradient(180deg,#edf9ff 0%,#f8fcff 42%,#eef8ff 100%);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink)}
+  button,input,select{font:inherit}
+  button{cursor:pointer}
+  .app{min-height:100vh;display:grid;grid-template-columns:255px 1fr}
+  .sidebar{position:sticky;top:0;height:100vh;padding:24px 18px;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border-right:1px solid var(--line);display:flex;flex-direction:column;z-index:20}
+  .brand{display:flex;gap:12px;align-items:center;padding:8px 8px 22px}
+  .logo{width:46px;height:46px;border-radius:15px;background:linear-gradient(135deg,var(--blue),#76cbff);display:grid;place-items:center;color:white;font-weight:900;font-size:23px;box-shadow:0 10px 25px rgba(26,134,232,.28)}
+  .brand-lockup{display:inline-grid;grid-template-columns:auto;line-height:1;width:max-content}
+  .brand-lockup .brand-name{font-family:Georgia,"Times New Roman",serif;font-size:21px;line-height:20px;font-weight:900;letter-spacing:-.5px;color:var(--navy)}
+  .brand-lockup .brand-year{justify-self:end;margin-top:1px;padding-right:2px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:9px;line-height:10px;font-weight:900;letter-spacing:1.8px;color:var(--blue)}
+  .brand-copy small{display:block;color:var(--muted);margin-top:5px;font-size:11px}
+  .inline-lockup{display:inline-grid;grid-template-columns:auto;vertical-align:middle;line-height:1;margin-right:7px;text-align:left}
+  .inline-lockup .inline-name{font-family:Georgia,"Times New Roman",serif;font-size:13px;line-height:12px;font-weight:900;letter-spacing:-.25px}
+  .inline-lockup .inline-year{justify-self:end;padding-right:1px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:7px;line-height:8px;font-weight:900;letter-spacing:1.2px}
+  .hero .inline-lockup{color:#fff}.hero .inline-year{color:#dff3ff}
+  .footer-lockup{display:inline-grid;grid-template-columns:auto;vertical-align:middle;line-height:1;margin-right:5px;color:var(--navy)}
+  .footer-lockup .inline-name{font-family:Georgia,"Times New Roman",serif;font-size:13px;line-height:12px;font-weight:900}
+  .footer-lockup .inline-year{justify-self:end;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:7px;line-height:8px;font-weight:900;letter-spacing:1.2px;color:var(--blue)}
+  .nav{display:grid;gap:8px}.nav button{border:0;background:transparent;padding:12px 13px;border-radius:12px;color:#5a7187;text-align:left;display:flex;gap:11px;align-items:center;font-weight:700}.nav button:hover,.nav button.active{background:#eaf7ff;color:var(--blue)}
+  .nav .ico{width:24px;text-align:center}
+  .connection-card{margin-top:auto;background:linear-gradient(145deg,#eaf7ff,#f8fcff);border:1px solid #cdeafa;padding:16px;border-radius:16px}.connection-card .tag{display:inline-flex;align-items:center;gap:7px;padding:5px 8px;background:white;color:var(--blue);border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.8px}.connection-card h4{margin:11px 0 6px;font-size:14px}.connection-card p{margin:0;color:var(--muted);font-size:12px;line-height:1.55}.connection-card .btn{width:100%;margin-top:12px}
+  .main{padding:0 28px 40px;min-width:0}
+  .topbar{height:88px;display:flex;align-items:center;justify-content:space-between;gap:16px;position:sticky;top:0;z-index:15;background:rgba(239,249,255,.84);backdrop-filter:blur(15px);border-bottom:1px solid rgba(204,231,247,.72)}
+  .topbar h1{font-size:21px;margin:2px 0 0}.eyebrow{text-transform:uppercase;font-size:10px;letter-spacing:1.6px;font-weight:850;color:var(--blue)}
+  .top-actions{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap}.sync{display:flex;align-items:center;gap:7px;background:white;border:1px solid var(--line);border-radius:999px;padding:8px 12px;font-size:12px;color:var(--muted)}.pulse{width:8px;height:8px;border-radius:50%;background:#28b486;box-shadow:0 0 0 5px rgba(40,180,134,.1)}
+  .btn{border:0;border-radius:12px;padding:11px 14px;font-weight:800;transition:.18s ease;display:inline-flex;align-items:center;justify-content:center;gap:8px}.btn:hover{transform:translateY(-1px)}.btn-primary{background:linear-gradient(135deg,var(--blue),#48b9ff);color:white;box-shadow:0 10px 24px rgba(26,134,232,.24)}.btn-secondary{background:white;border:1px solid var(--line);color:var(--navy)}.btn-danger{background:var(--red-soft);color:var(--red)}.btn-sm{padding:8px 10px;font-size:12px}
+  .hero{margin-top:22px;border-radius:26px;overflow:hidden;background:linear-gradient(115deg,#1285e7 0%,#42b9fb 60%,#9cdfff 100%);box-shadow:var(--shadow);position:relative;color:white;padding:30px 32px;display:flex;justify-content:space-between;gap:24px;align-items:center}.hero:after{content:"";position:absolute;width:250px;height:250px;border-radius:50%;border:45px solid rgba(255,255,255,.11);right:-55px;top:-85px}.hero:before{content:"";position:absolute;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.09);right:190px;bottom:-80px}.hero>*{position:relative;z-index:1}.hero h2{font-size:31px;line-height:1.12;margin:8px 0 10px;max-width:720px}.hero p{max-width:760px;margin:0;color:#eaf7ff;line-height:1.65}.hero-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}.hero .btn-primary{background:white;color:var(--blue);box-shadow:none}.hero .btn-secondary{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.35);color:white;backdrop-filter:blur(8px)}
+  .notice{margin-top:14px;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;background:#fff8e7;border:1px solid #f3dfaa;border-radius:14px;color:#8d6814;font-size:12px}.notice strong{color:#714f00}
+  .kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin-top:18px}.card{background:rgba(255,255,255,.95);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-sm)}.kpi{padding:17px;display:flex;gap:13px;align-items:center}.kpi-icon{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;font-weight:900}.i-blue{background:#e9f6ff;color:var(--blue)}.i-green{background:var(--green-soft);color:var(--green)}.i-amber{background:var(--amber-soft);color:var(--amber)}.i-red{background:var(--red-soft);color:var(--red)}.i-navy{background:#eef3f8;color:var(--navy)}.kpi small{color:var(--muted);font-weight:650}.kpi strong{display:block;font-size:24px;margin-top:2px}.kpi em{font-style:normal;color:var(--muted);font-size:11px}
+  .section{margin-top:22px}.section-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:12px}.section-head h3{font-size:20px;margin:3px 0 0}.section-head p{margin:0;color:var(--muted);font-size:12px}.section-actions{display:flex;gap:8px;flex-wrap:wrap}
+  .capacity-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.capacity{padding:18px}.cap-top{display:flex;align-items:start;justify-content:space-between;gap:12px}.cap-cat{display:flex;align-items:center;gap:10px}.cat-badge{min-width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,#e5f6ff,#f8fcff);border:1px solid #cceaf9;color:var(--blue);font-weight:900}.cap-cat h4{margin:0;font-size:16px}.cap-cat small{color:var(--muted)}.fee{font-size:12px;background:#f5fbff;border:1px solid var(--line);padding:7px 9px;border-radius:10px;color:var(--navy);font-weight:800}.cap-stats{margin:18px 0 9px;display:flex;align-items:end;justify-content:space-between}.cap-stats strong{font-size:26px}.cap-stats span{color:var(--muted);font-size:12px}.progress{height:10px;background:#edf4f8;border-radius:999px;overflow:hidden}.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),#53c1ff);border-radius:inherit}.cap-foot{display:flex;justify-content:space-between;margin-top:10px;font-size:11px;color:var(--muted)}
+  .filters{padding:15px;display:grid;grid-template-columns:1.5fr repeat(4,minmax(140px,.7fr)) auto;gap:10px;align-items:end}.field label{display:block;color:#678094;font-size:10px;font-weight:850;letter-spacing:.55px;text-transform:uppercase;margin-bottom:6px}.field input,.field select{width:100%;height:42px;border:1px solid var(--line);background:#fbfdff;border-radius:11px;padding:0 11px;color:var(--ink);outline:0}.field input:focus,.field select:focus{border-color:#6bc4fa;box-shadow:0 0 0 3px rgba(77,183,255,.12)}.search-wrap{position:relative}.search-wrap span{position:absolute;left:12px;top:10px;color:#8ca2b5}.search-wrap input{padding-left:34px}
+  .insights{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:10px}.insight{padding:13px 15px}.insight span{display:block;font-size:11px;color:var(--muted)}.insight b{font-size:18px;margin-top:4px;display:block}
+  .table-card{margin-top:12px;overflow:hidden}.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse;min-width:1180px}.table th{background:#f5fbff;padding:12px 13px;border-bottom:1px solid var(--line);text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.65px;color:#71889c;white-space:nowrap}.table td{padding:13px;border-bottom:1px solid #edf4f8;vertical-align:middle;font-size:12px}.table tr:hover td{background:#fbfdff}.primary-text{font-weight:850;color:var(--navy)}.subtext{display:block;color:var(--muted);font-size:11px;margin-top:3px}.pill{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border-radius:999px;font-size:10px;font-weight:850}.pill.pending{background:var(--amber-soft);color:#a96d00}.pill.approved{background:var(--green-soft);color:#147a59}.pill.rejected{background:var(--red-soft);color:#a93c48}.dot{width:6px;height:6px;border-radius:50%;background:currentColor}.tx{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#f5f8fa;border-radius:8px;padding:6px 8px;display:inline-flex;align-items:center;gap:7px}.copy{border:0;background:transparent;color:var(--blue);padding:0;font-weight:900}.verify-select{min-width:130px;border:1px solid var(--line);height:36px;border-radius:10px;background:white;color:var(--ink);padding:0 9px}.locked{display:inline-flex;gap:6px;align-items:center;color:#788d9f;font-size:11px}.empty{padding:45px;text-align:center;color:var(--muted)}.empty strong{display:block;color:var(--navy);font-size:17px;margin-bottom:6px}
+  .analytics-grid{display:grid;grid-template-columns:1.4fr .8fr;gap:14px}.chart-card,.pending-card{padding:18px}.chart{height:210px;display:flex;align-items:end;gap:12px;margin-top:18px;padding:0 4px}.bar-col{flex:1;min-width:28px;text-align:center}.bar{height:var(--h);min-height:6px;background:linear-gradient(180deg,#4fbbfb,#1386e8);border-radius:9px 9px 4px 4px;box-shadow:0 5px 14px rgba(26,134,232,.15)}.bar-col b{font-size:11px;display:block;margin:7px 0 2px}.bar-col span{font-size:9px;color:var(--muted)}.pending-list{display:grid;gap:9px;margin-top:14px}.pending-row{display:flex;justify-content:space-between;gap:10px;padding:10px 11px;background:#fbfdff;border:1px solid #edf3f7;border-radius:11px}.pending-row b{font-size:11px}.pending-row small{display:block;color:var(--muted);margin-top:2px}.pending-row .amt{font-weight:850;color:var(--navy)}
+  footer{display:flex;justify-content:space-between;gap:15px;color:#8aa0b2;font-size:10px;padding:25px 4px 5px}
+  .backdrop{position:fixed;inset:0;background:rgba(11,43,72,.32);backdrop-filter:blur(5px);display:grid;place-items:center;padding:18px;z-index:100}.backdrop[hidden]{display:none}.modal{width:min(680px,100%);max-height:90vh;overflow:auto;background:white;border:1px solid var(--line);border-radius:22px;box-shadow:0 24px 80px rgba(16,76,120,.28);padding:22px}.modal-head{display:flex;justify-content:space-between;gap:12px;align-items:start}.modal h3{margin:3px 0 5px}.modal p{margin:0;color:var(--muted);font-size:12px;line-height:1.55}.close{width:35px;height:35px;border-radius:10px;border:1px solid var(--line);background:white;color:var(--muted)}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:17px}.form-grid .full{grid-column:1/-1}.form-grid label{font-size:11px;font-weight:800;color:#60798f}.form-grid input,.form-grid select{width:100%;height:42px;margin-top:6px;border:1px solid var(--line);border-radius:10px;padding:0 10px;outline:0}.modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:18px}.confirm-box{padding:15px;background:#fff8e6;border:1px solid #f2dfab;border-radius:12px;color:#825d05;font-size:12px;line-height:1.6;margin-top:15px}.toast-wrap{position:fixed;right:20px;bottom:20px;z-index:150;display:grid;gap:9px}.toast{background:#163f66;color:white;border-radius:13px;padding:12px 14px;box-shadow:var(--shadow);font-size:12px;animation:toastIn .2s ease}.toast.ok{background:#13795a}.toast.bad{background:#a83e4a}@keyframes toastIn{from{transform:translateY(8px);opacity:0}}
+  .theme-toggle{width:42px;height:38px;padding:0;border-radius:12px;font-size:17px}.connection-error{display:none;margin-top:14px;padding:12px 16px;background:var(--red-soft);border:1px solid #efc4ca;border-radius:14px;color:#963c49;font-size:12px}.connection-error.show{display:flex;align-items:center;justify-content:space-between;gap:12px}.loading-overlay{position:fixed;inset:0;z-index:200;background:rgba(234,247,255,.72);backdrop-filter:blur(4px);display:grid;place-items:center}.loading-overlay[hidden]{display:none}.loader-card{display:flex;align-items:center;gap:12px;padding:16px 19px;background:var(--white);border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow);color:var(--navy);font-size:13px;font-weight:800}.spinner{width:20px;height:20px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--blue);animation:spin .7s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}.endpoint-list{display:grid;gap:9px;margin-top:16px}.endpoint{padding:12px;border:1px solid var(--line);border-radius:12px;background:#f8fcff}.endpoint code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--blue);font-size:11px}.endpoint b{display:inline-block;min-width:55px;color:var(--navy);font-size:11px}.endpoint span{display:block;margin-top:5px;color:var(--muted);font-size:11px;line-height:1.5}.config-code{margin-top:14px;padding:14px;border-radius:12px;background:#102c46;color:#dff3ff;overflow:auto;font:11px/1.65 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre}.status-offline{background:#fff0f2!important;color:#a93c48!important}.status-online{background:#e9f9f2!important;color:#147a59!important}
+  body[data-theme="dark"]{--navy:#d9edff;--ink:#e6f0f8;--muted:#92a8ba;--line:#29445a;--soft:#132638;--white:#132536;--blue-3:#173a55;--green-soft:#153d35;--amber-soft:#40351d;--red-soft:#42242d;--shadow:0 18px 50px rgba(0,0,0,.32);--shadow-sm:0 8px 26px rgba(0,0,0,.24);background:linear-gradient(180deg,#08131e 0%,#0d1c2a 46%,#091723 100%);color:var(--ink);color-scheme:dark}
+  body[data-theme="dark"] .sidebar{background:rgba(12,27,40,.95);border-color:var(--line)}body[data-theme="dark"] .topbar{background:rgba(8,22,34,.9);border-color:var(--line)}body[data-theme="dark"] .card,body[data-theme="dark"] .modal,body[data-theme="dark"] .loader-card{background:rgba(19,37,54,.98);border-color:var(--line)}body[data-theme="dark"] .connection-card,body[data-theme="dark"] .integration-band{background:linear-gradient(145deg,#102a3e,#132536);border-color:var(--line)}body[data-theme="dark"] .connection-card .tag,body[data-theme="dark"] .sync{background:#1b3449;border-color:var(--line)}body[data-theme="dark"] .nav button:hover,body[data-theme="dark"] .nav button.active{background:#17344b;color:#65c5ff}body[data-theme="dark"] .btn-secondary,body[data-theme="dark"] .close,body[data-theme="dark"] .btn-ghost{background:#162c3f;border-color:var(--line);color:#dcecff}body[data-theme="dark"] .field input,body[data-theme="dark"] .field select,body[data-theme="dark"] .form-grid input,body[data-theme="dark"] .form-grid select,body[data-theme="dark"] .verify-select{background:#0e2131;border-color:var(--line);color:var(--ink)}body[data-theme="dark"] .field select option,body[data-theme="dark"] .form-grid select option{background:#0e2131;color:var(--ink)}body[data-theme="dark"] .table th{background:#102638;color:#95abc0;border-color:var(--line)}body[data-theme="dark"] .table td{border-color:#20384b}body[data-theme="dark"] .table tr:hover td{background:#142b3d}body[data-theme="dark"] .detail-item,body[data-theme="dark"] .pending-row,body[data-theme="dark"] .tour-step,body[data-theme="dark"] .endpoint{background:#102638;border-color:var(--line)}body[data-theme="dark"] .tx{background:#0d2030}body[data-theme="dark"] .fee,body[data-theme="dark"] .mode{background:#102638;border-color:var(--line);color:#a9d9f8}body[data-theme="dark"] .cat-badge{background:linear-gradient(135deg,#173a55,#102638);border-color:var(--line)}body[data-theme="dark"] .progress{background:#0c1d2b}body[data-theme="dark"] .i-blue,body[data-theme="dark"] .i-navy{background:#173a55}body[data-theme="dark"] .i-green{background:#153d35}body[data-theme="dark"] .i-amber{background:#40351d}body[data-theme="dark"] .i-red{background:#42242d}body[data-theme="dark"] .notice{background:#382f1e;border-color:#63522d;color:#e7c878}body[data-theme="dark"] .notice strong{color:#ffe4a3}body[data-theme="dark"] .confirm-box{background:#382f1e;border-color:#63522d;color:#ead08b}body[data-theme="dark"] .connection-error{background:#3d2029;border-color:#69313e;color:#ffabb5}body[data-theme="dark"] .loading-overlay{background:rgba(4,12,19,.75)}body[data-theme="dark"] .brand-lockup .brand-name,body[data-theme="dark"] .footer-lockup{color:#d9edff}body[data-theme="dark"] .empty strong{color:#d9edff}
+  .flow-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.flow-step{padding:17px;position:relative;overflow:hidden}.flow-step .step-no{width:30px;height:30px;border-radius:10px;background:#e9f6ff;color:var(--blue);display:grid;place-items:center;font-weight:900;margin-bottom:12px}.flow-step h4{margin:0 0 6px;font-size:14px}.flow-step p{margin:0;color:var(--muted);font-size:11px;line-height:1.55}.flow-step .mode{display:inline-flex;margin-top:10px;padding:5px 8px;border-radius:999px;background:#f5fbff;border:1px solid var(--line);font-size:9px;color:var(--navy);font-weight:800}.integration-band{margin-top:12px;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px;background:linear-gradient(120deg,#f7fcff,#eaf7ff);border:1px solid var(--line);border-radius:16px}.integration-band b{display:block;font-size:13px}.integration-band span{color:var(--muted);font-size:11px;line-height:1.5}.flow-arrow{color:#9cc9e8;font-weight:900;align-self:center}.record-actions{display:flex;gap:6px;align-items:center}.btn-ghost{border:1px solid var(--line);background:#fff;color:var(--blue);border-radius:9px;padding:7px 9px;font-size:10px;font-weight:850}.btn-ghost:hover{background:#eef8ff}.kpi{cursor:pointer}.kpi:hover{border-color:#b8def4;transform:translateY(-1px)}.capacity{cursor:pointer}.capacity:hover{border-color:#b8def4}.bar{cursor:pointer;transition:.18s}.bar:hover{filter:brightness(.96);transform:translateY(-2px)}.pending-row{align-items:center}.pending-actions{display:flex;align-items:center;gap:8px}.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}.detail-item{padding:12px;background:#f8fcff;border:1px solid var(--line);border-radius:11px}.detail-item span{display:block;color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:.7px;font-weight:850}.detail-item b{display:block;margin-top:5px;font-size:12px;word-break:break-word}.status-banner{padding:13px 14px;border-radius:12px;margin-top:15px;font-size:12px;font-weight:750}.status-banner.pending{background:var(--amber-soft);color:#8b6100}.status-banner.approved{background:var(--green-soft);color:#126c50}.status-banner.rejected{background:var(--red-soft);color:#a23947}.tour-steps{display:grid;gap:9px;margin-top:16px}.tour-step{display:flex;gap:11px;padding:12px;border:1px solid var(--line);border-radius:12px;background:#fbfdff}.tour-step i{font-style:normal;width:28px;height:28px;border-radius:9px;background:#e9f6ff;color:var(--blue);display:grid;place-items:center;font-weight:900;flex:0 0 auto}.tour-step b{font-size:12px}.tour-step span{display:block;color:var(--muted);font-size:11px;margin-top:2px;line-height:1.45}.quick-live{background:#e9f9f2;color:#147a59;border:1px solid #c9ebdd}.seat-full{color:var(--red)!important;font-weight:850}
+  .mobile-menu{display:none}
+  @media(max-width:1100px){.flow-grid{grid-template-columns:1fr 1fr}.app{grid-template-columns:1fr}.sidebar{position:fixed;left:-275px;width:255px;transition:.22s}.sidebar.open{left:0;box-shadow:20px 0 60px rgba(22,65,99,.18)}.main{padding:0 18px 30px}.mobile-menu{display:inline-flex}.kpis{grid-template-columns:repeat(2,1fr)}.capacity-grid{grid-template-columns:1fr}.filters{grid-template-columns:1fr 1fr}.analytics-grid{grid-template-columns:1fr}.hero{align-items:flex-start;flex-direction:column}.hero-actions{justify-content:flex-start}.insights{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:650px){.flow-grid{grid-template-columns:1fr}.detail-grid{grid-template-columns:1fr}.integration-band{align-items:flex-start;flex-direction:column}.topbar{height:auto;padding:15px 0}.top-actions .sync{display:none}.hero{padding:24px 20px}.hero h2{font-size:25px}.kpis{grid-template-columns:1fr}.filters{grid-template-columns:1fr}.insights{grid-template-columns:1fr 1fr}.form-grid{grid-template-columns:1fr}.form-grid .full{grid-column:auto}.main{padding:0 12px 25px}.section-head{align-items:flex-start;flex-direction:column}.notice{align-items:flex-start;flex-direction:column}footer{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="logo">V</div><div class="brand-copy"><span class="brand-lockup" aria-label="VIKAS 2026"><span class="brand-name">VIKAS</span><span class="brand-year">2026</span></span><small>Payment Verification</small></div></div>
+    <nav class="nav">
+      <button class="active" data-target="overview"><span class="ico">⌂</span> Overview</button>
+      <button data-target="payments"><span class="ico">₹</span> Payments</button>
+      <button data-target="capacity"><span class="ico">◎</span> Seat Capacity</button>
+      <button data-target="analytics"><span class="ico">▥</span> Analytics</button>
+      <button data-target="flow"><span class="ico">⇄</span> Backend Setup</button>
+    </nav>
+    <div class="connection-card">
+      <span class="tag status-offline" id="connectionBadge">● NOT CONNECTED</span>
+      <h4 id="connectionTitle">Backend setup required</h4>
+      <p id="connectionHelp">Insert the API base URL in the configuration block. No participant data is stored in this browser.</p>
+      <button class="btn btn-secondary btn-sm" id="integrationPlan">View API contract</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:10px"><button class="btn btn-secondary btn-sm mobile-menu" id="mobileMenu">☰</button><div><div class="eyebrow">IEEE SLRTCE Student Branch</div><h1>Payment Administration Dashboard</h1></div></div>
+      <div class="top-actions"><div class="sync"><span class="pulse" id="syncPulse"></span><span id="lastSync">Waiting for backend</span></div><button class="btn btn-secondary btn-sm theme-toggle" id="themeToggle" type="button" aria-label="Switch to dark theme" title="Toggle theme">☾</button><button class="btn btn-secondary btn-sm" id="refreshData">↻ Refresh</button><button class="btn btn-secondary btn-sm" id="feeSettings">⚙ Fee settings</button></div>
+    </header>
+
+    <section class="hero" id="overview">
+      <div><div class="eyebrow" style="color:#e9f7ff"><span class="inline-lockup" aria-label="VIKAS 2026"><span class="inline-name">VIKAS</span><span class="inline-year">2026</span></span><span>• Finance Desk</span></div><h2>Track, verify and export every shortlisted participant payment.</h2><p>Designed for UG teams and individual PG / PPG participants. Every transaction can be verified once, locked permanently, filtered by date and exported for official records.</p></div>
+      <div class="hero-actions"><button class="btn btn-primary" id="addPayment">＋ Add payment</button><button class="btn btn-secondary" id="exportCurrent">⇩ Export Excel</button></div>
+    </section>
+
+    <div class="notice"><span><strong>Production rule:</strong> only server-verified APPROVED payments consume seats. Approval and rejection must be permanently enforced by the backend.</span><span id="databaseLabel">Database: awaiting configuration</span></div>
+    <div class="connection-error" id="connectionError"><span id="connectionErrorText">The backend could not be reached.</span><button class="btn btn-danger btn-sm" id="retryConnection">Retry</button></div>
+
+    <section class="kpis">
+      <div class="card kpi"><div class="kpi-icon i-blue">₹</div><div><small>Total payments</small><strong id="kTotal">0</strong><em>all submitted records</em></div></div>
+      <div class="card kpi"><div class="kpi-icon i-green">✓</div><div><small>Approved</small><strong id="kApproved">0</strong><em>verified & locked</em></div></div>
+      <div class="card kpi"><div class="kpi-icon i-amber">⌛</div><div><small>Pending</small><strong id="kPending">0</strong><em>needs bank check</em></div></div>
+      <div class="card kpi"><div class="kpi-icon i-red">×</div><div><small>Rejected</small><strong id="kRejected">0</strong><em>locked rejection</em></div></div>
+      <div class="card kpi"><div class="kpi-icon i-navy">₹</div><div><small>Verified amount</small><strong id="kAmount">₹0</strong><em>approved only</em></div></div>
+    </section>
+
+    <section class="section" id="capacity">
+      <div class="section-head"><div><div class="eyebrow">Real-time capacity</div><h3>Confirmed seats by category</h3></div><p>Only APPROVED payments count toward the seat limit.</p></div>
+      <div class="capacity-grid" id="capacityGrid"></div>
+    </section>
+
+    <section class="section" id="payments">
+      <div class="section-head"><div><div class="eyebrow">Payment ledger</div><h3>Verify transactions</h3></div><div class="section-actions"><button class="btn btn-secondary btn-sm" id="exportAll">Export all</button><button class="btn btn-primary btn-sm" id="addPayment2">＋ Add payment</button></div></div>
+      <div class="card filters">
+        <div class="field"><label>Search</label><div class="search-wrap"><span>⌕</span><input id="search" placeholder="Team, leader, email, reg. ID, transaction ID" /></div></div>
+        <div class="field"><label>Category</label><select id="category"><option value="ALL">All</option><option>UG</option><option>PG</option><option>PPG</option></select></div>
+        <div class="field"><label>Status</label><select id="status"><option value="ALL">All</option><option value="PENDING">Pending</option><option value="APPROVED">Approved</option><option value="REJECTED">Rejected</option></select></div>
+        <div class="field"><label>Date</label><select id="dateMode"><option value="ALL">All dates</option><option value="TODAY">Today</option><option value="YESTERDAY">Yesterday</option><option value="EXACT">Specific date</option><option value="RANGE">Date range</option></select></div>
+        <div class="field" id="date1Wrap" style="display:none"><label id="date1Label">Date</label><input type="date" id="date1" /></div>
+        <button class="btn btn-secondary" id="clearFilters">Clear</button>
+      </div>
+      <div class="card filters" id="date2Wrap" style="display:none;margin-top:10px;grid-template-columns:1fr 1fr auto"><div class="field"><label>From</label><input type="date" id="rangeFrom" /></div><div class="field"><label>To</label><input type="date" id="rangeTo" /></div><button class="btn btn-secondary" id="applyRange">Apply range</button></div>
+      <div class="insights"><div class="card insight"><span>Records in current view</span><b id="iCount">0</b></div><div class="card insight"><span>Approved amount</span><b id="iAmount">₹0</b></div><div class="card insight"><span>Pending review</span><b id="iPending">0</b></div><div class="card insight"><span>Approved seats</span><b id="iSeats">0</b></div></div>
+      <div class="card table-card"><div class="table-wrap"><table class="table"><thead><tr><th>Registration</th><th>Team / Participant</th><th>Category</th><th>Leader / Email</th><th>Transaction ID</th><th>Payment date & time</th><th>Amount</th><th>Status</th><th>Verification action</th><th>Record</th></tr></thead><tbody id="paymentRows"></tbody></table></div><div class="empty" id="empty" hidden><strong>No matching payment records</strong>Change the category, date, status or search filter.</div></div>
+    </section>
+
+    <section class="section" id="analytics">
+      <div class="section-head"><div><div class="eyebrow">Analytics</div><h3>Daily payment activity</h3></div><p>Last 7 calendar days • all categories</p></div>
+      <div class="analytics-grid"><div class="card chart-card"><div class="section-head" style="margin:0"><div><b>Payment volume</b><p>Submitted payment records per day</p></div></div><div class="chart" id="chart"></div></div><div class="card pending-card"><div><b>Pending verification</b><p style="margin:4px 0 0;color:var(--muted);font-size:11px">Most recent records needing a bank / UPI check.</p></div><div class="pending-list" id="pendingList"></div></div></div>
+    </section>
+
+    <section class="section" id="flow">
+      <div class="section-head"><div><div class="eyebrow">Production architecture</div><h3>Backend and database connection</h3></div><div class="section-actions"><button class="btn btn-primary btn-sm" id="integrationPlan2">View API contract</button></div></div>
+      <div class="flow-grid">
+        <div class="card flow-step"><div class="step-no">1</div><h4>Shortlist participant</h4><p>Workflow 3 marks an eligible UG team or PG/PPG participant as shortlisted.</p><span class="mode">FIREBASE / n8n</span></div>
+        <div class="card flow-step"><div class="step-no">2</div><h4>Open payment page</h4><p>The website reads registration ID, category and the correct fee automatically. Participant does not retype identity data.</p><span class="mode">VIKAS WEBSITE</span></div>
+        <div class="card flow-step"><div class="step-no">3</div><h4>Pay using UPI / QR</h4><p>The participant pays through the official event QR / UPI flow and submits the transaction reference.</p><span class="mode">GPay / UPI / QR</span></div>
+        <div class="card flow-step"><div class="step-no">4</div><h4>Store payment</h4><p>A webhook saves the payment record with category, amount, transaction ID, date and time.</p><span class="mode">n8n → FIREBASE</span></div>
+        <div class="card flow-step"><div class="step-no">5</div><h4>Finance verifies once</h4><p>Admin checks the bank/UPI statement and selects Approve or Reject. The decision is then permanently locked.</p><span class="mode">THIS DASHBOARD</span></div>
+        <div class="card flow-step"><div class="step-no">6</div><h4>Seats + reports update</h4><p>Approved payments consume category seats instantly. Filters, daily counts and Excel exports remain available.</p><span class="mode">REAL-TIME DASHBOARD</span></div>
+      </div>
+      <div class="integration-band"><div><b>Frontend boundary</b><span>This file calls a configurable REST API and never stores participant or payment records locally.</span></div><div><b>Secure database boundary</b><span>Your backend connects to Firebase, Supabase, MongoDB, MySQL or another database. Never place database credentials in this HTML file.</span></div></div>
+    </section>
+
+    <footer><span><span class="footer-lockup" aria-label="VIKAS 2026"><span class="inline-name">VIKAS</span><span class="inline-year">2026</span></span><span>• Payment Administration Dashboard</span></span><span>Research • Innovate • Impact</span></footer>
+  </main>
+</div>
+
+<div class="backdrop" id="paymentModal" hidden><div class="modal"><div class="modal-head"><div><div class="eyebrow">Finance entry</div><h3>Add payment record</h3><p>The record will be validated and saved through the configured backend API.</p></div><button class="close" data-close="paymentModal">×</button></div><form id="paymentForm"><div class="form-grid">
+<label>Category<select name="category" id="formCategory" required><option>UG</option><option>PG</option><option>PPG</option></select></label>
+<label>Registration ID<input name="registrationId" placeholder="VIKAS26-UG-ABC123" required></label>
+<label>Team / Participant name<input name="teamName" placeholder="Enter registered team or participant name" required></label>
+<label>Leader / Participant name<input name="leaderName" required></label>
+<label class="full">Leader / Participant email<input type="email" name="email" required></label>
+<label>Transaction ID<input name="transactionId" required placeholder="UPI / bank reference ID"></label>
+<label>Amount (₹)<input type="number" min="1" name="amount" id="formAmount" required></label>
+<label>Payment date<input type="date" name="date" required></label>
+<label>Payment time<input type="time" name="time" required></label>
+</div><div class="modal-actions"><button type="button" class="btn btn-secondary" data-close="paymentModal">Cancel</button><button class="btn btn-primary" type="submit">Save payment</button></div></form></div></div>
+
+<div class="backdrop" id="feeModal" hidden><div class="modal" style="width:min(520px,100%)"><div class="modal-head"><div><div class="eyebrow">Server configuration</div><h3>Fee & seat settings</h3><p>Changes are written to the backend and must be restricted to authenticated administrators.</p></div><button class="close" data-close="feeModal">×</button></div><form id="feeForm"><div class="form-grid">
+<label>UG fee (₹)<input type="number" min="1" name="UGFee"></label><label>UG seats<input type="number" min="1" name="UGSeats"></label>
+<label>PG fee (₹)<input type="number" min="1" name="PGFee"></label><label>PG seats<input type="number" min="1" name="PGSeats"></label>
+<label>PPG fee (₹)<input type="number" min="1" name="PPGFee"></label><label>PPG seats<input type="number" min="1" name="PPGSeats"></label>
+</div><div class="modal-actions"><button type="button" class="btn btn-secondary" data-close="feeModal">Cancel</button><button class="btn btn-primary" type="submit">Save settings</button></div></form></div></div>
+
+<div class="backdrop" id="confirmModal" hidden><div class="modal" style="width:min(500px,100%)"><div class="modal-head"><div><div class="eyebrow">Permanent verification</div><h3 id="confirmTitle">Confirm decision</h3><p id="confirmText"></p></div><button class="close" data-close="confirmModal">×</button></div><div class="confirm-box"><b>Important:</b> once approved or rejected, this payment record is locked and cannot be changed from this dashboard.</div><div class="modal-actions"><button class="btn btn-secondary" data-close="confirmModal">Cancel</button><button class="btn btn-primary" id="confirmDecision">Confirm & lock</button></div></div></div>
+
+<div class="backdrop" id="detailModal" hidden><div class="modal" style="width:min(620px,100%)"><div class="modal-head"><div><div class="eyebrow">Payment record</div><h3 id="detailTitle">Payment details</h3><p>Complete information stored for finance verification.</p></div><button class="close" data-close="detailModal">×</button></div><div id="detailBody"></div><div class="modal-actions" id="detailActions"><button class="btn btn-secondary" data-close="detailModal">Close</button></div></div></div>
+
+<div class="backdrop" id="integrationModal" hidden><div class="modal" style="width:min(760px,100%)"><div class="modal-head"><div><div class="eyebrow">Production integration</div><h3>Backend API contract</h3><p>Edit only the marked <b>VIKAS_BACKEND_CONFIG</b> block near the bottom of this HTML. The server may use any database.</p></div><button class="close" data-close="integrationModal">×</button></div><div class="endpoint-list"><div class="endpoint"><b>GET</b> <code>/health</code><span>Returns <code>{ "ok": true }</code> for connection monitoring.</span></div><div class="endpoint"><b>GET</b> <code>/payments</code><span>Returns an array or <code>{ "payments": [...] }</code>.</span></div><div class="endpoint"><b>POST</b> <code>/payments</code><span>Creates a payment record after server-side validation and duplicate checks.</span></div><div class="endpoint"><b>PATCH</b> <code>/payments/:id/verify</code><span>Body: <code>{ "status": "APPROVED" | "REJECTED" }</code>. The backend must reject all later changes.</span></div><div class="endpoint"><b>GET</b> <code>/payment-config</code><span>Returns category fee and seat configuration.</span></div><div class="endpoint"><b>PUT</b> <code>/payment-config</code><span>Saves authenticated fee and capacity settings.</span></div></div><div class="config-code">window.VIKAS_BACKEND_CONFIG = {
+  baseUrl: "https://YOUR-BACKEND-DOMAIN.com/api",
+  databaseProvider: "YOUR_DATABASE",
+  authMode: "bearer",
+  tokenStorageKey: "vikas_admin_token",
+  pollIntervalMs: 30000
+};</div><div class="confirm-box"><b>Security:</b> keep database passwords, service-account keys and payment-gateway secrets on the backend. Do not paste them into this file. Authentication and immutable verification must be enforced by the server.</div><div class="modal-actions"><button class="btn btn-primary" data-close="integrationModal">Understood</button></div></div></div>
+
+<div class="toast-wrap" id="toasts"></div>
+<div class="loading-overlay" id="loadingOverlay" hidden><div class="loader-card"><span class="spinner"></span><span id="loadingText">Loading payment data…</span></div></div>
+
+<script>
+/*
+ * VIKAS 2026 PAYMENT DASHBOARD — PRODUCTION CONNECTION BLOCK
+ * -------------------------------------------------------------------------
+ * Your backend developer should edit this object only.
+ * Database credentials must stay on the backend and must never be added here.
+ */
+window.VIKAS_BACKEND_CONFIG = {
+  baseUrl: "https://YOUR-BACKEND-DOMAIN.com/api",
+  databaseProvider: "YOUR_DATABASE",
+  authMode: "bearer",
+  pollIntervalMs: 30000,
+  endpoints: {
+    health: "/health",
+    payments: "/payments",
+    paymentConfig: "/payment-config"
+  }
+};
+
+(() => {
+  'use strict';
+
+  const $ = selector => document.querySelector(selector);
+  const $$ = selector => [...document.querySelectorAll(selector)];
+  const API = window.VIKAS_BACKEND_CONFIG;
+  const EMPTY_CONFIG = {
+    UG: { fee: 0, seats: 0 },
+    PG: { fee: 0, seats: 0 },
+    PPG: { fee: 0, seats: 0 }
+  };
+
+  let records = [];
+  let paymentConfig = structuredClone(EMPTY_CONFIG);
+  let pendingDecision = null;
+  let pollTimer = null;
+  let connected = false;
+
+  const pad = value => String(value).padStart(2, '0');
+  const localDate = (date = new Date()) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+  const money = value => '₹' + Number(value || 0).toLocaleString('en-IN');
+  const esc = value => String(value ?? '').replace(/[&<>'"]/g, character => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+  }[character]));
+  const configured = () => Boolean(API.baseUrl && !API.baseUrl.includes('YOUR-BACKEND'));
+  const endpoint = path => `${API.baseUrl.replace(/\/$/, '')}/${String(path).replace(/^\//, '')}`;
+  const accessToken = () => sessionStorage.getItem(API.tokenStorageKey || 'vikas_admin_token') || '';
+
+  function requestHeaders(hasBody = false) {
+    const headers = { Accept: 'application/json' };
+    if (hasBody) headers['Content-Type'] = 'application/json';
+    const token = accessToken();
+    if (API.authMode === 'bearer' && token) headers.Authorization = `Bearer ${token}`;
+    return headers;
+  }
+
+  async function apiRequest(path, options = {}) {
+    if (!configured()) {
+      const error = new Error('Backend URL is not configured. Open the API contract for setup instructions.');
+      error.code = 'CONFIG_REQUIRED';
+      throw error;
+    }
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+    try {
+      const response = await fetch(endpoint(path), {
+        method: options.method || 'GET',
+        headers: requestHeaders(options.body !== undefined),
+        body: options.body === undefined ? undefined : JSON.stringify(options.body),
+        credentials: API.authMode === 'cookie' ? 'include' : 'same-origin',
+        signal: controller.signal
+      });
+      if (response.status === 401 || response.status === 403) {
+        throw new Error('Administrator authentication is required or has expired.');
+      }
+      if (!response.ok) {
+        let message = `Backend request failed (${response.status}).`;
+        try {
+          const payload = await response.json();
+          message = payload.message || payload.error || message;
+        } catch {}
+        throw new Error(message);
+      }
+      if (response.status === 204) return null;
+      return response.json();
+    } catch (error) {
+      if (error.name === 'AbortError') throw new Error('The backend request timed out.');
+      throw error;
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
+  const normalisePayments = payload => {
+    const list = Array.isArray(payload) ? payload : payload?.payments || payload?.data?.payments || payload?.data || [];
+    if (!Array.isArray(list)) throw new Error('The payments endpoint did not return an array.');
+    return list.map(item => {
+      const status = String(item.status || 'PENDING').toUpperCase();
+      return {
+      id: String(item.id || item.paymentId || item._id || ''),
+      registrationId: String(item.registrationId || ''),
+      teamName: String(item.teamName || item.participantName || ''),
+      leaderName: String(item.leaderName || item.participantName || ''),
+      email: String(item.email || ''),
+      category: String(item.category || '').toUpperCase(),
+      transactionId: String(item.transactionId || item.utr || ''),
+      date: String(item.date || item.paymentDate || '').slice(0, 10),
+      time: String(item.time || item.paymentTime || '').slice(0, 5),
+      amount: Number(item.amount || 0),
+      status,
+      locked: Boolean(item.locked || status === 'APPROVED' || status === 'REJECTED'),
+      lockedAt: item.lockedAt || item.verifiedAt || '',
+      lockedBy: item.lockedBy || item.verifiedBy || ''
+    }}).filter(item => item.id);
+  };
+
+  function normaliseConfig(payload) {
+    const source = payload?.config || payload?.data?.config || payload?.data || payload || {};
+    return Object.fromEntries(['UG', 'PG', 'PPG'].map(category => [category, {
+      fee: Number(source[category]?.fee || 0),
+      seats: Number(source[category]?.seats || 0)
+    }]));
+  }
+
+  function setLoading(active, text = 'Loading payment data…') {
+    $('#loadingText').textContent = text;
+    $('#loadingOverlay').hidden = !active;
+  }
+
+  function setConnectionState(isConnected, message = '') {
+    connected = isConnected;
+    const badge = $('#connectionBadge');
+    badge.textContent = isConnected ? '● BACKEND CONNECTED' : '● NOT CONNECTED';
+    badge.classList.toggle('status-online', isConnected);
+    badge.classList.toggle('status-offline', !isConnected);
+    $('#connectionTitle').textContent = isConnected ? 'Production data is live' : 'Backend setup required';
+    $('#connectionHelp').textContent = isConnected
+      ? `Connected to ${API.databaseProvider || 'the configured database'} through the secure API.`
+      : 'Insert the API base URL in the configuration block. No participant data is stored in this browser.';
+    $('#databaseLabel').textContent = `Database: ${isConnected ? (API.databaseProvider || 'connected') : 'awaiting configuration'}`;
+    $('#syncPulse').style.background = isConnected ? '#28b486' : '#d95562';
+    $('#connectionError').classList.toggle('show', Boolean(message));
+    if (message) $('#connectionErrorText').textContent = message;
+  }
+
+  function toast(message, type = 'ok') {
+    const element = document.createElement('div');
+    element.className = `toast ${type}`;
+    element.textContent = message;
+    $('#toasts').appendChild(element);
+    setTimeout(() => element.remove(), 3600);
+  }
+
+  async function loadData(showLoader = true) {
+    if (showLoader) setLoading(true);
+    try {
+      if (!configured()) throw Object.assign(new Error('Add the backend base URL in VIKAS_BACKEND_CONFIG to load real records.'), { code: 'CONFIG_REQUIRED' });
+      const [paymentsPayload, configPayload] = await Promise.all([
+        apiRequest(API.endpoints.payments),
+        apiRequest(API.endpoints.paymentConfig)
+      ]);
+      records = normalisePayments(paymentsPayload);
+      paymentConfig = normaliseConfig(configPayload);
+      setConnectionState(true);
+      $('#lastSync').textContent = 'Updated ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      render();
+    } catch (error) {
+      records = [];
+      paymentConfig = structuredClone(EMPTY_CONFIG);
+      setConnectionState(false, error.message);
+      $('#lastSync').textContent = error.code === 'CONFIG_REQUIRED' ? 'Backend not configured' : 'Connection failed';
+      render();
+    } finally {
+      if (showLoader) setLoading(false);
+    }
+  }
+
+  const fmtDate = value => {
+    if (!value) return 'Not provided';
+    const [year, month, day] = value.split('-');
+    return year && month && day ? `${day}/${month}/${year}` : value;
+  };
+  const statusPill = value => {
+    const status = ['PENDING', 'APPROVED', 'REJECTED'].includes(value) ? value : 'PENDING';
+    return `<span class="pill ${status.toLowerCase()}"><span class="dot"></span>${status[0] + status.slice(1).toLowerCase()}</span>`;
+  };
+  const getFilters = () => ({
+    q: $('#search').value.trim().toLowerCase(), category: $('#category').value,
+    status: $('#status').value, dateMode: $('#dateMode').value,
+    date1: $('#date1').value, from: $('#rangeFrom').value, to: $('#rangeTo').value
+  });
+  const filtered = () => {
+    const filters = getFilters();
+    const today = localDate();
+    const yesterdayDate = new Date();
+    yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+    const yesterday = localDate(yesterdayDate);
+    return records.filter(record => {
+      if (filters.category !== 'ALL' && record.category !== filters.category) return false;
+      if (filters.status !== 'ALL' && record.status !== filters.status) return false;
+      if (filters.q && !`${record.registrationId} ${record.teamName} ${record.leaderName} ${record.email} ${record.transactionId}`.toLowerCase().includes(filters.q)) return false;
+      if (filters.dateMode === 'TODAY' && record.date !== today) return false;
+      if (filters.dateMode === 'YESTERDAY' && record.date !== yesterday) return false;
+      if (filters.dateMode === 'EXACT' && filters.date1 && record.date !== filters.date1) return false;
+      if (filters.dateMode === 'RANGE' && ((filters.from && record.date < filters.from) || (filters.to && record.date > filters.to))) return false;
+      return true;
+    }).sort((a, b) => `${b.date} ${b.time}`.localeCompare(`${a.date} ${a.time}`));
+  };
+
+  function render() {
+    $('#kTotal').textContent = records.length;
+    $('#kApproved').textContent = records.filter(record => record.status === 'APPROVED').length;
+    $('#kPending').textContent = records.filter(record => record.status === 'PENDING').length;
+    $('#kRejected').textContent = records.filter(record => record.status === 'REJECTED').length;
+    $('#kAmount').textContent = money(records.filter(record => record.status === 'APPROVED').reduce((sum, record) => sum + record.amount, 0));
+
+    $('#capacityGrid').innerHTML = ['UG', 'PG', 'PPG'].map(category => {
+      const used = records.filter(record => record.category === category && record.status === 'APPROVED').length;
+      const total = paymentConfig[category]?.seats || 0;
+      const left = Math.max(0, total - used);
+      const percentage = total ? Math.min(100, Math.round(used / total * 100)) : 0;
+      return `<div class="card capacity" data-capcat="${category}"><div class="cap-top"><div class="cap-cat"><div class="cat-badge">${category}</div><div><h4>${category === 'UG' ? 'UG Teams' : `${category} Participants`}</h4><small>${used} confirmed</small></div></div><div class="fee">Fee ${money(paymentConfig[category]?.fee)}</div></div><div class="cap-stats"><div><strong>${used}</strong><span> / ${total || '—'} seats</span></div><span>${percentage}% filled</span></div><div class="progress"><i style="width:${percentage}%"></i></div><div class="cap-foot"><span class="${total && left === 0 ? 'seat-full' : ''}">${total ? (left === 0 ? 'FULL' : `${left} seats remaining`) : 'Capacity not configured'}</span><span>${total || '—'} capacity</span></div></div>`;
+    }).join('');
+
+    const view = filtered();
+    $('#iCount').textContent = view.length;
+    $('#iAmount').textContent = money(view.filter(record => record.status === 'APPROVED').reduce((sum, record) => sum + record.amount, 0));
+    $('#iPending').textContent = view.filter(record => record.status === 'PENDING').length;
+    $('#iSeats').textContent = view.filter(record => record.status === 'APPROVED').length;
+    $('#paymentRows').innerHTML = view.map(record => `<tr><td><span class="primary-text">${esc(record.registrationId || 'Not provided')}</span><span class="subtext">${esc(record.id)}</span></td><td><span class="primary-text">${esc(record.teamName || 'Not provided')}</span></td><td><span class="pill" style="background:var(--blue-3);color:var(--blue)">${esc(record.category)}</span></td><td><span class="primary-text">${esc(record.leaderName || 'Not provided')}</span><span class="subtext">${esc(record.email || 'Not provided')}</span></td><td><span class="tx">${esc(record.transactionId || 'Not provided')} <button class="copy" data-copy="${esc(record.transactionId)}" title="Copy">⧉</button></span></td><td><span class="primary-text">${fmtDate(record.date)}</span><span class="subtext">${esc(record.time || 'Not provided')}</span></td><td><span class="primary-text">${money(record.amount)}</span></td><td>${statusPill(record.status)}</td><td>${record.locked ? '<span class="locked">🔒 Final decision locked</span>' : `<select class="verify-select" data-id="${esc(record.id)}"><option value="">Choose action</option><option value="APPROVED">Approve</option><option value="REJECTED">Reject</option></select>`}</td><td><button class="btn-ghost view-record" data-id="${esc(record.id)}">View</button></td></tr>`).join('');
+    $('#empty').hidden = view.length > 0;
+    $('#empty').innerHTML = connected
+      ? '<strong>No matching payment records</strong>Change the category, date, status or search filter.'
+      : '<strong>No production data loaded</strong>Connect the backend API to display real payment records.';
+    renderChart();
+    renderPending();
+    bindDynamic();
+  }
+
+  function renderChart() {
+    const days = [];
+    for (let offset = 6; offset >= 0; offset--) {
+      const date = new Date();
+      date.setDate(date.getDate() - offset);
+      const key = localDate(date);
+      days.push({ date, key, count: records.filter(record => record.date === key).length });
+    }
+    const maximum = Math.max(1, ...days.map(day => day.count));
+    $('#chart').innerHTML = days.map(day => `<div class="bar-col"><div class="bar" data-date="${day.key}" title="${day.count} payments • click to filter" style="--h:${Math.max(8, Math.round(day.count / maximum * 165))}px"></div><b>${day.count}</b><span>${day.date.toLocaleDateString([], { day: '2-digit', month: 'short' })}</span></div>`).join('');
+    $$('#chart .bar').forEach(bar => bar.onclick = () => {
+      $('#dateMode').value = 'EXACT'; $('#date1').value = bar.dataset.date;
+      $('#date1Wrap').style.display = 'block'; $('#payments').scrollIntoView({ behavior: 'smooth' }); render();
+    });
+  }
+
+  function renderPending() {
+    const pending = records.filter(record => record.status === 'PENDING').sort((a, b) => `${b.date}${b.time}`.localeCompare(`${a.date}${a.time}`)).slice(0, 5);
+    $('#pendingList').innerHTML = pending.length
+      ? pending.map(record => `<div class="pending-row"><div><b>${esc(record.teamName)}</b><small>${esc(record.category)} • ${fmtDate(record.date)} ${esc(record.time)}</small></div><div class="pending-actions"><div class="amt">${money(record.amount)}</div><button class="btn-ghost view-record" data-id="${esc(record.id)}">Review</button></div></div>`).join('')
+      : '<div class="empty" style="padding:25px 5px"><strong>All caught up</strong>No pending payments.</div>';
+  }
+
+  function open(id) { $('#' + id).hidden = false; }
+  function close(id) { $('#' + id).hidden = true; }
+
+  function showRecord(id) {
+    const record = records.find(item => item.id === id);
+    if (!record) return;
+    $('#detailTitle').textContent = record.teamName || 'Payment details';
+    $('#detailBody').innerHTML = `<div class="status-banner ${record.status.toLowerCase()}">${statusPill(record.status)} ${record.locked ? '• Final decision locked' : '• Waiting for finance verification'}</div><div class="detail-grid"><div class="detail-item"><span>Registration ID</span><b>${esc(record.registrationId || 'Not provided')}</b></div><div class="detail-item"><span>Payment ID</span><b>${esc(record.id)}</b></div><div class="detail-item"><span>Category</span><b>${esc(record.category)}</b></div><div class="detail-item"><span>Amount</span><b>${money(record.amount)}</b></div><div class="detail-item"><span>Leader / Participant</span><b>${esc(record.leaderName || 'Not provided')}</b></div><div class="detail-item"><span>Email</span><b>${esc(record.email || 'Not provided')}</b></div><div class="detail-item"><span>Transaction ID</span><b>${esc(record.transactionId || 'Not provided')}</b></div><div class="detail-item"><span>Paid on</span><b>${fmtDate(record.date)} • ${esc(record.time || 'Not provided')}</b></div>${record.locked ? `<div class="detail-item"><span>Locked at</span><b>${record.lockedAt ? new Date(record.lockedAt).toLocaleString() : 'Recorded'}</b></div><div class="detail-item"><span>Verified by</span><b>${esc(record.lockedBy || 'Finance Admin')}</b></div>` : ''}</div>`;
+    const actions = $('#detailActions');
+    actions.innerHTML = `<button class="btn btn-secondary" data-close="detailModal">Close</button><button class="btn btn-secondary" id="copyDetailTx">⧉ Copy transaction ID</button>${record.locked ? '' : '<button class="btn btn-danger detail-decision" data-status="REJECTED">Reject</button><button class="btn btn-primary detail-decision" data-status="APPROVED">Approve</button>'}`;
+    actions.querySelector('[data-close]').onclick = () => close('detailModal');
+    $('#copyDetailTx').onclick = () => copyText(record.transactionId);
+    actions.querySelectorAll('.detail-decision').forEach(button => button.onclick = () => requestDecision(record, button.dataset.status));
+    open('detailModal');
+  }
+
+  function requestDecision(record, status) {
+    pendingDecision = { id: record.id, status };
+    $('#confirmTitle').textContent = status === 'APPROVED' ? 'Approve this payment?' : 'Reject this payment?';
+    $('#confirmText').textContent = `${record.teamName} • ${record.transactionId} • ${money(record.amount)}. The backend must permanently lock this decision.`;
+    $('#confirmDecision').className = 'btn ' + (status === 'APPROVED' ? 'btn-primary' : 'btn-danger');
+    close('detailModal'); open('confirmModal');
+  }
+
+  async function copyText(value) {
+    try { await navigator.clipboard.writeText(value); toast('Transaction ID copied'); }
+    catch { toast('Copy failed', 'bad'); }
+  }
+
+  function bindDynamic() {
+    $$('.verify-select').forEach(select => select.onchange = () => {
+      if (!select.value) return;
+      const record = records.find(item => item.id === select.dataset.id);
+      if (record) requestDecision(record, select.value);
+    });
+    $$('[data-copy]').forEach(button => button.onclick = () => copyText(button.dataset.copy));
+    $$('.view-record').forEach(button => button.onclick = () => showRecord(button.dataset.id));
+    $$('[data-capcat]').forEach(card => card.onclick = () => {
+      $('#category').value = card.dataset.capcat; $('#payments').scrollIntoView({ behavior: 'smooth' }); render();
+    });
+  }
+
+  function prepareForm() {
+    const form = $('#paymentForm');
+    form.reset();
+    form.elements.date.value = localDate();
+    form.elements.time.value = new Date().toTimeString().slice(0, 5);
+    form.elements.category.value = 'UG';
+    form.elements.amount.value = paymentConfig.UG.fee || '';
+  }
+
+  async function savePayment(event) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const values = Object.fromEntries(new FormData(form).entries());
+    if (!configured()) { open('integrationModal'); toast('Configure the backend before saving.', 'bad'); return; }
+    setLoading(true, 'Saving payment record…');
+    try {
+      await apiRequest(API.endpoints.payments, { method: 'POST', body: {
+        registrationId: values.registrationId.trim(), teamName: values.teamName.trim(),
+        leaderName: values.leaderName.trim(), email: values.email.trim(), category: values.category,
+        transactionId: values.transactionId.trim(), amount: Number(values.amount),
+        date: values.date, time: values.time
+      }});
+      close('paymentModal'); toast('Payment record saved'); await loadData(false);
+    } catch (error) { toast(error.message, 'bad'); }
+    finally { setLoading(false); }
+  }
+
+  async function verifyPayment() {
+    if (!pendingDecision) return;
+    setLoading(true, 'Saving final verification…');
+    try {
+      const path = `${API.endpoints.payments}/${encodeURIComponent(pendingDecision.id)}/verify`;
+      await apiRequest(path, { method: 'PATCH', body: { status: pendingDecision.status } });
+      close('confirmModal'); toast(`Payment ${pendingDecision.status.toLowerCase()} and locked`);
+      pendingDecision = null; await loadData(false);
+    } catch (error) { toast(error.message, 'bad'); }
+    finally { setLoading(false); }
+  }
+
+  async function saveSettings(event) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const payload = Object.fromEntries(['UG', 'PG', 'PPG'].map(category => [category, {
+      fee: Number(form.elements[category + 'Fee'].value), seats: Number(form.elements[category + 'Seats'].value)
+    }]));
+    setLoading(true, 'Saving fee and capacity settings…');
+    try {
+      await apiRequest(API.endpoints.paymentConfig, { method: 'PUT', body: payload });
+      close('feeModal'); toast('Fee and seat settings saved'); await loadData(false);
+    } catch (error) { toast(error.message, 'bad'); }
+    finally { setLoading(false); }
+  }
+
+  function exportXls(data, name = 'VIKAS-2026-Payments') {
+    if (!data.length) { toast('There are no records to export.', 'bad'); return; }
+    const columns = ['Payment ID', 'Registration ID', 'Team / Participant', 'Leader / Participant', 'Email', 'Category', 'Amount', 'Transaction ID', 'Payment Date', 'Payment Time', 'Verification Status', 'Locked', 'Locked At'];
+    const rows = data.map(record => [record.id, record.registrationId, record.teamName, record.leaderName, record.email, record.category, record.amount, record.transactionId, record.date, record.time, record.status, record.locked ? 'Yes' : 'No', record.lockedAt]);
+    const cell = value => `<Cell><Data ss:Type="${typeof value === 'number' ? 'Number' : 'String'}">${String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;')}</Data></Cell>`;
+    const xml = `<?xml version="1.0"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Worksheet ss:Name="Payments"><Table><Row>${columns.map(cell).join('')}</Row>${rows.map(row => `<Row>${row.map(cell).join('')}</Row>`).join('')}</Table></Worksheet></Workbook>`;
+    const anchor = document.createElement('a');
+    anchor.href = URL.createObjectURL(new Blob([xml], { type: 'application/vnd.ms-excel' }));
+    anchor.download = `${name}-${localDate()}.xls`;
+    anchor.click();
+    setTimeout(() => URL.revokeObjectURL(anchor.href), 1000);
+    toast('Excel file exported');
+  }
+
+  function applyTheme(theme) {
+    document.body.dataset.theme = theme;
+    const dark = theme === 'dark';
+    $('#themeToggle').textContent = dark ? '☀' : '☾';
+    $('#themeToggle').setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    $('#themeToggle').title = dark ? 'Switch to light theme' : 'Switch to dark theme';
+    localStorage.setItem('vikas_dashboard_theme', theme);
+  }
+
+  function initialiseEvents() {
+    $$('[data-close]').forEach(button => button.onclick = () => close(button.dataset.close));
+    ['paymentModal', 'feeModal', 'confirmModal', 'detailModal', 'integrationModal'].forEach(id => $('#' + id).addEventListener('click', event => { if (event.target.id === id) close(id); }));
+    $('#confirmDecision').onclick = verifyPayment;
+    $('#paymentForm').onsubmit = savePayment;
+    $('#feeForm').onsubmit = saveSettings;
+    $('#addPayment').onclick = $('#addPayment2').onclick = () => { if (!configured()) return open('integrationModal'); prepareForm(); open('paymentModal'); };
+    $('#feeSettings').onclick = () => {
+      if (!configured()) return open('integrationModal');
+      const form = $('#feeForm');
+      ['UG', 'PG', 'PPG'].forEach(category => {
+        form.elements[category + 'Fee'].value = paymentConfig[category].fee || '';
+        form.elements[category + 'Seats'].value = paymentConfig[category].seats || '';
+      });
+      open('feeModal');
+    };
+    $('#formCategory').onchange = event => { $('#formAmount').value = paymentConfig[event.target.value]?.fee || ''; };
+    $('#refreshData').onclick = $('#retryConnection').onclick = () => loadData();
+    $('#integrationPlan').onclick = $('#integrationPlan2').onclick = () => open('integrationModal');
+    $('#exportCurrent').onclick = () => exportXls(filtered(), 'VIKAS-2026-Filtered-Payments');
+    $('#exportAll').onclick = () => exportXls(records, 'VIKAS-2026-All-Payments');
+    ['search', 'category', 'status', 'dateMode', 'date1', 'rangeFrom', 'rangeTo'].forEach(id => $('#' + id).addEventListener(id === 'search' ? 'input' : 'change', () => {
+      const mode = $('#dateMode').value;
+      $('#date1Wrap').style.display = mode === 'EXACT' ? 'block' : 'none';
+      $('#date2Wrap').style.display = mode === 'RANGE' ? 'grid' : 'none';
+      render();
+    }));
+    $('#applyRange').onclick = render;
+    $('#clearFilters').onclick = () => {
+      $('#search').value = ''; $('#category').value = 'ALL'; $('#status').value = 'ALL'; $('#dateMode').value = 'ALL';
+      $('#date1').value = ''; $('#rangeFrom').value = ''; $('#rangeTo').value = '';
+      $('#date1Wrap').style.display = 'none'; $('#date2Wrap').style.display = 'none'; render();
+    };
+    $$('.nav button').forEach(button => button.onclick = () => {
+      $$('.nav button').forEach(item => item.classList.remove('active')); button.classList.add('active');
+      $('#' + button.dataset.target).scrollIntoView({ behavior: 'smooth' }); $('#sidebar').classList.remove('open');
+    });
+    $('#mobileMenu').onclick = () => $('#sidebar').classList.toggle('open');
+    [['kTotal', 'ALL'], ['kApproved', 'APPROVED'], ['kPending', 'PENDING'], ['kRejected', 'REJECTED']].forEach(([id, status]) => $('#' + id).closest('.kpi').onclick = () => {
+      $('#status').value = status; $('#payments').scrollIntoView({ behavior: 'smooth' }); render();
+    });
+    $('#kAmount').closest('.kpi').onclick = () => { $('#status').value = 'APPROVED'; $('#payments').scrollIntoView({ behavior: 'smooth' }); render(); };
+    $('#themeToggle').onclick = () => applyTheme(document.body.dataset.theme === 'dark' ? 'light' : 'dark');
+    document.addEventListener('keydown', event => { if (event.key === 'Escape') ['paymentModal', 'feeModal', 'confirmModal', 'detailModal', 'integrationModal'].forEach(close); });
+  }
+
+  function startPolling() {
+    clearInterval(pollTimer);
+    if (configured() && Number(API.pollIntervalMs) > 0) {
+      pollTimer = setInterval(() => { if (!document.hidden) loadData(false); }, Number(API.pollIntervalMs));
+    }
+  }
+
+  const savedTheme = localStorage.getItem('vikas_dashboard_theme');
+  applyTheme(savedTheme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+  initialiseEvents();
+  render();
+  loadData();
+  startPolling();
+})();
+
+</script>
+</body>
+</html>
